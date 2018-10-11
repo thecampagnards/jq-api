@@ -1,0 +1,5 @@
+vendor/
+_*
+*.test
+.DS_Store
+main
