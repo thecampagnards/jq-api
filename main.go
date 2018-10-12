@@ -2,6 +2,7 @@ package main
 
 import (
 	"crypto/tls"
+	"encoding/json"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -62,6 +63,11 @@ func parse(c echo.Context) error {
 	value, err := op.Apply(body)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, err)
+	}
+
+	var js json.RawMessage
+	if json.Unmarshal(value, &js) == nil {
+		c.Response().Header().Set(echo.HeaderContentType, echo.MIMEApplicationJSONCharsetUTF8)
 	}
 
 	return c.String(http.StatusOK, string(value))
