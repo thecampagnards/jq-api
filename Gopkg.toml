@@ -27,11 +27,7 @@
 
 [[constraint]]
   name = "github.com/labstack/echo"
-  version = "3.3.6"
-
-[[constraint]]
-  branch = "master"
-  name = "github.com/savaki/jq"
+  version = "3.3.8"
 
 [prune]
   go-tests = true
