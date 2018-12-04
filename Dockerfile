@@ -9,6 +9,6 @@ RUN go get -u github.com/golang/dep/cmd/dep \
 FROM stedolan/jq
 
 COPY --from=builder /go/src/jq-api/app .
-CMD ["./app"]
+ENTRYPOINT ["./app"]
 
 EXPOSE 8080
