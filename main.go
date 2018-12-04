@@ -1,26 +1,23 @@
 package main
 
 import (
+	"bytes"
 	"crypto/tls"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"os/exec"
 
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
-	"github.com/savaki/jq"
 )
 
 func parse(c echo.Context) error {
 
 	// Decode the jq query
 	j, err := url.QueryUnescape(c.QueryParam("jq"))
-	if err != nil {
-		return c.JSON(http.StatusBadRequest, err)
-	}
-
-	op, err := jq.Parse(j)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, err)
 	}
@@ -60,9 +57,13 @@ func parse(c echo.Context) error {
 	}
 
 	// Execute jq
-	value, err := op.Apply(body)
+	cmd := exec.Command("bash", "-c", fmt.Sprintf("jq %s <<< '%s'", j, string(body)))
+	var stderr bytes.Buffer
+	cmd.Stderr = &stderr
+
+	value, err := cmd.Output()
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, err)
+		return c.JSON(http.StatusBadRequest, fmt.Sprintf("Error: %s, %s", err, stderr.String()))
 	}
 
 	var js json.RawMessage
