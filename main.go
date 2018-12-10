@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"os"
 	"os/exec"
 
 	"github.com/labstack/echo"
@@ -56,8 +57,20 @@ func parse(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, err)
 	}
 
+	// Copy it in a temp file
+	file, err := ioutil.TempFile("/tmp", "jqInput_")
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err)
+	}
+	defer os.Remove(file.Name())
+
+	_, err = file.Write(body)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err)
+	}
+
 	// Execute jq
-	cmd := exec.Command("bash", "-c", fmt.Sprintf("jq %s <<< '%s'", j, string(body)))
+	cmd := exec.Command("bash", "-c", fmt.Sprintf("jq %s '%s'", j, file.Name()))
 	var stderr bytes.Buffer
 	cmd.Stderr = &stderr
 
