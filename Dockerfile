@@ -1,4 +1,4 @@
-FROM golang:1.13.8 as builder
+FROM golang:1.14.0 as builder
 
 WORKDIR /go/src/jq-api
 COPY . .
